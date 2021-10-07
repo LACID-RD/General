@@ -81,7 +81,7 @@ def main():
                 blur = skimage.filters.gaussian(blur, sigma=1.0)
                 
                 t = skimage.filters.threshold_otsu(blur)
-                mask = blur > T
+                mask = blur > t
                 
                 skimage.io.imshow(mask)
                 
