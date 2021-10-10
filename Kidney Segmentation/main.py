@@ -24,6 +24,8 @@ import skimage.color
 import skimage.filters
 import skimage.io
 
+from mpl_toolkits import mplot3d
+
 np.set_printoptions(threshold=sys.maxsize)
 
 # Main #
@@ -60,36 +62,70 @@ def main():
                 Data_img=np.copy(dcm.pixel_array)  
                 Dcm_imagen.append(Data_img)
                 
-                #Generar la imagen
-                #plt.imshow(Data_img, cmap = plt.cm.bone)
-                #plt.title("Imágen")
-                #plt.show()  
-                
+
                 # HACER HISTOGRAMA DE TRESHOLD ??
             
-                n, bins, patches = plt.hist(dcm.pixel_array, 64, density=True, fc="b", ec="k")
-                plt.ylim([0,0.08])
-                plt.xlim([0,1250])
-                plt.title("Intensity Histogram")
+                # n, bins, patches = plt.hist(dcm.pixel_array, 64, density=True, fc="b", ec="k")
+                # plt.ylim([0,0.08])
+                # plt.xlim([0,1250])
+                # plt.title("Intensity Histogram")
+                # plt.show()
+
+                # # MASCARA 
+                # image = skimage.io.imread(fname=Data_img)
+                # skimage.io.imshow(image)
+                
+                # blur = skimage.color.rgb2gray(image)
+                # blur = skimage.filters.gaussian(blur, sigma=1.0)
+                
+                # t = skimage.filters.threshold_otsu(blur)
+                # mask = blur > t
+                
+                # skimage.io.imshow(mask)
+                
+                # sel = np.zeros_like(image)
+                # sel[mask] = image[mask]
+                # skimage.io.imshow(sel)
+
+
+
+
+                #Imágen 2D
+
+                fig = plt.figure(figsize=(15,15))
+
+                fig.add_subplot(1,3,1)
+                plt.imshow(Data_img, cmap = plt.cm.bone)
+                plt.axis("off")
+                plt.title("W/O Threshold")
+
+                fig.add_subplot(1,3,2)
+                treshhold = dcm.pixel_array.copy()
+                treshhold[treshhold < 1000] = 0
+                treshhold[treshhold > 1100] = 0
+                #print(mask1)
+                plt.imshow(treshhold, cmap=plt.cm.bone)
+                plt.title("With Treshhold")
+                plt.axis("off")
+                
+                fig.add_subplot(1,3,3)
+                superPositionData = np.multiply(dcm.pixel_array,treshhold)
+                plt.imshow(superPositionData, cmap=plt.cm.bone)
+                plt.title("Superposition")
+                plt.axis("off")
                 plt.show()
 
-                # MASCARA 
-                image = skimage.io.imread(fname=Data_img)
-                skimage.io.imshow(image)
-                
-                blur = skimage.color.rgb2gray(image)
-                blur = skimage.filters.gaussian(blur, sigma=1.0)
-                
-                t = skimage.filters.threshold_otsu(blur)
-                mask = blur > t
-                
-                skimage.io.imshow(mask)
-                
-                sel = np.zeros_like(image)
-                sel[mask] = image[mask]
-                skimage.io.imshow(sel)
 
 
+                #Imágen 3D:
+
+                # fig3D = plt.figure(fidsize=(10,10))
+                # ax = plt.axes(proyection="3d")
+                # ax.scatter()
+                
+                # plt.axis("off")
+                # plt.show()
+                print(dcm.pixel_array.shape)
 
     print(Data_img)
     print(type(Data_img))
