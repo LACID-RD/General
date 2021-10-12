@@ -94,15 +94,15 @@ class ObjetoDicom:
         #### 15: Orientación de la imagen, cosenos directores de la primer fila y columna 12
         #### 16: Tamaño de píxel: fila y columna 13
         #### 17: SOLO PHILIPS... Trigger time
-        if "SIE" in ffReDC[4]:
-            ffReDC.append(DcmAux[0x0020,0x0032].value)
-            #Cosenos directores de la primera fila y columna)
-            ffReDC.append(DcmAux[0x0020,0x0037].value)
-            ffReDC.append(DcmAux[0x0028,0x0030].value)
-        elif "GE" in ffReDC[4]:
-            ffReDC.append(DcmAux[0x0020,0x0032].value)
-            ffReDC.append(DcmAux[0x0020,0x0037].value)
-            ffReDC.append(DcmAux[0x0028,0x0030].value)
+        # if "SIE" in ffReDC[4]:
+        #     ffReDC.append(DcmAux[0x0020,0x0032].value)
+        #     #Cosenos directores de la primera fila y columna)
+        #     ffReDC.append(DcmAux[0x0020,0x0037].value)
+        #     ffReDC.append(DcmAux[0x0028,0x0030].value)
+        # elif "GE" in ffReDC[4]:
+        #     ffReDC.append(DcmAux[0x0020,0x0032].value)
+        #     ffReDC.append(DcmAux[0x0020,0x0037].value)
+        #     ffReDC.append(DcmAux[0x0028,0x0030].value)
         # elif "Phil" in ffReDC[4]:
         #     #ffImPo2=DcmAux[0x5200,0x9230][0]
         #     ffImPo1=ffImPo2[0x0020,0x9113][0]
