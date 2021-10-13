@@ -26,6 +26,8 @@ import skimage.filters
 import skimage.io
 import rawMethods
 from mpl_toolkits import mplot3d
+import segmentation as seg
+from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -34,6 +36,7 @@ def main():
     
     #Abrir variables
     Dcm_imagen = []
+    matriz = []
     ImageNumber = 0
     #Abre cuadro de diálogo y pregunta path del forlder
     cuadro=tk.Tk()
@@ -64,9 +67,33 @@ def main():
                 Data_img=np.copy(dcm.pixel_array)  
                 Dcm_imagen.append(Data_img)
 
+                houndfieldArray = apply_modality_lut((dcm.pixel_array), dcm)
+                
+
+
+                
+                #Produce histogramas de las intensidades de cada toma
+
+                #treshMatrix = rawMethods.thresholdMatrix(Data_img)
+
                 #rawMethods.histogram2D(Data_img)
-                #rawMethods.imagePlots(Data_img)
-    
+                
+                #Produce 3 figuras comparativas CT/Mascara/Superposition
+
+                #rawMethods.imagePlots(Data_img, dcm)
+                arrayHU = rawMethods.getHoundfieldArray(dcm)
+            
+                mat = np.copy(arrayHU)
+                matriz.append(mat)
+
+    matriz = np.array(matriz)
+    print(matriz.shape)
+    print(matriz[15,:,:])
+
+
+
+
+
     #(572,512) SAGITAL
     #(572,512) CORONAL
 
@@ -74,10 +101,22 @@ def main():
 
     #rawMethods.volumetricPlot(Matrix3DVolumeIntensities)
 
-    #print(Matrix3DVolumeIntensities) ### SE MUERE TODITO SI IMPRIMIS ESTO
+#    print(Matrix3DVolumeIntensities) ### SE MUERE TODITO SI IMPRIMIS ESTO
 
     print(Matrix3DVolumeIntensities.shape)
+    print(type(Matrix3DVolumeIntensities))
     print(ImageNumber)
+
+    ## SEGMENTACION
+    size = Matrix3DVolumeIntensities.shape
+    #contour = np.zeros((size[0],size[1],size[2]))
+
+    # for i in range(ImageNumber):
+        
+    #     contour[i,:,:] = seg.get_contour(Matrix3DVolumeIntensities[i,:,:])
+
+    # print(contour)
+
 
 #Ejecuta función main() 
 if __name__ == '__main__':
