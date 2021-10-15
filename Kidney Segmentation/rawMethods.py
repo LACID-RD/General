@@ -37,34 +37,30 @@ def getHoundfieldArray(dcm):
 
 def thresholdMatrix(Data_img):
     
-    treshold = Data_img.copy()
+    threshold = Data_img.copy()
     
-    treshold[treshold < 1000] = 0
-    treshold[treshold > 1100] = 0
+    threshold[threshold < 1000] = 0
+    threshold[threshold > 1100] = 0
+    #threshold[threshold >= 1000] = 1
+    #threshold[threshold <= 1100] = 1
 
-    return treshold
-
-
-def binaryArray(houndfieldArray):
-
-    binaryArray = houndfieldArray.copy()
-
-    binaryArray[binaryArray >= 20] = 1
-    binaryArray[binaryArray > 40] = 0
-    binaryArray[binaryArray < 20] = 0
-
-    array = binaryArray
-
-    return array
+    return threshold
 
 
-def houndfieldMask(houndfieldArray):
+def binaryMask(array):
+    mask = array
 
-    mask = binaryArray(houndfieldArray)
+    return mask
 
-    mask[mask >= 20] = 1000
-    mask[mask > 40] = 0
-    mask[mask < 20] = 0
+
+def houndfieldMask(dcm):
+
+    mask = getHoundfieldArray(dcm)
+    #mask = int(mask)
+    #mask[mask >= 20] = 1000
+    
+    mask[mask > 100] = -1000
+    mask[mask < 0] = -1000
 
     return mask
 
@@ -74,11 +70,12 @@ def imagePlots(Data_img, dcm):
 
     treshold = thresholdMatrix(Data_img)
     arrayHU = getHoundfieldArray(dcm)
+    HUMASK = houndfieldMask(dcm)
     
     fig = plt.figure(figsize=(15, 15))
 
     fig.add_subplot(1, 4, 1)
-    plt.imshow(Data_img, cmap="gray", vmin=0, vmax=255)
+    plt.imshow(Data_img, cmap=plt.cm.bone)
     plt.axis("off")
     plt.title("W/O Threshold")
 
@@ -87,18 +84,18 @@ def imagePlots(Data_img, dcm):
     plt.title("With Treshold")
     plt.axis("off")
 #cmap=plt.cm.bone
+#cmap="gray", vmin=0, vmax=255
     fig.add_subplot(1, 4, 3)
     superPositionData = np.multiply(Data_img, treshold)
-    plt.imshow(superPositionData, cmap="gray", vmin=0, vmax=255)
+    plt.imshow(superPositionData, cmap=plt.cm.bone)
     plt.title("Superposition")
     plt.axis("off")
     
     fig.add_subplot(1, 4, 4)
-    plt.imshow(arrayHU, cmap="gray", vmin=0, vmax=255)
-    plt.title("Houndfield Mask")
+    plt.imshow(HUMASK, cmap="gray", vmin=0, vmax=255)
+    plt.title("HU Coeff.")
     plt.axis("off")
 
-    plt.show()
 
 
 def histogram2D(Data_img):

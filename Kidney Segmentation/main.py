@@ -29,7 +29,7 @@ from mpl_toolkits import mplot3d
 import segmentation as seg
 from pydicom.pixel_data_handlers.util import apply_modality_lut
 
-np.set_printoptions(threshold=sys.maxsize)
+#np.set_printoptions(threshold=sys.maxsize)
 
 # Main #
 def main(): 
@@ -67,10 +67,12 @@ def main():
                 Data_img=np.copy(dcm.pixel_array)  
                 Dcm_imagen.append(Data_img)
 
-                houndfieldArray = apply_modality_lut((dcm.pixel_array), dcm)
-                
 
+                #print("Numéro de corte: " + str(ImageNumber))
+                #print("Valores de pixeles: " + str(Data_img[200, 30]))
+                #print("Valores de pixeles: " + str(Data_img[100, 100]))
 
+                #houndfieldArray = apply_modality_lut((dcm.pixel_array), dcm)
                 
                 #Produce histogramas de las intensidades de cada toma
 
@@ -80,18 +82,14 @@ def main():
                 
                 #Produce 3 figuras comparativas CT/Mascara/Superposition
 
-                #rawMethods.imagePlots(Data_img, dcm)
+                rawMethods.imagePlots(Data_img, dcm)
+
                 arrayHU = rawMethods.getHoundfieldArray(dcm)
-            
-                mat = np.copy(arrayHU)
-                matriz.append(mat)
 
-    matriz = np.array(matriz)
-    print(matriz.shape)
-    print(matriz[15,:,:])
+                #print("Valores HU: " + str(arrayHU[100,100]))
 
 
-
+                
 
 
     #(572,512) SAGITAL
