@@ -32,7 +32,10 @@ from plotly.tools import FigureFactory as FF
 from plotly.graph_objs import *
 from gui import *
 from myshow import myshow, myshow3d
+import pandas as pd
+from numba import jit,cuda,vectorize,njit
 
+##@njit(nogil=True)
 
 def multiplicableMask(pixelArray):
     mask = np.copy(pixelArray)
@@ -50,11 +53,14 @@ def multiplicableMask(pixelArray):
     return mask
 
 
+
+@jit()
 def getHoundfieldArray(dcm):
     arrayHU = (dcm.pixel_array*dcm.RescaleSlope) + dcm.RescaleIntercept
     return arrayHU
 
 
+@jit()
 def volHUMatrixGenerator():
 
     #Variables
@@ -106,6 +112,7 @@ def volHUMatrixGenerator():
     return vol_HU_matrix, sliceThickness, pixelSpacing
 
 
+@jit()
 def listOf2DMatrixTo3DMatrixGenerator(array):
     shape = np.shape(array)
     matrix3D = np.dstack(array)
@@ -113,6 +120,7 @@ def listOf2DMatrixTo3DMatrixGenerator(array):
     return matrix3D,shape
 
 
+@jit()
 def resampling(matrix_HU,sliceThickness,pixelSpacing):
     resampledArrayList = []
 
@@ -141,6 +149,7 @@ def resampling(matrix_HU,sliceThickness,pixelSpacing):
     return resampledMatrix
 
 
+@jit()
 def makeLungMasks(img, display=False):
     row_size = img.shape[0]
     col_size = img.shape[1]
@@ -218,18 +227,95 @@ def makeLungMasks(img, display=False):
 
         plt.show()
         #return mask*img
-    return mask
+    return mask,dilation
 
 
-def lungMaskMatrixGenerator(resampledMatrix):
+@jit()
+def lungMaskMatrixGenerator(resampledMatrix,display):
 
     shapeIter = np.shape(resampledMatrix)
     maskedList = []
-
+    dilationList = []
     for n in range(shapeIter[0]):
-        mask = makeLungMasks(resampledMatrix[n, :, :], display=False)
+        mask,dilation = makeLungMasks(resampledMatrix[n, :, :], display)
         maskedList.append(mask)
+        dilationList.append(dilation)
+
     processMatrix = np.dstack(maskedList)
     processMatrix = np.rollaxis(processMatrix,-1)
 
-    return processMatrix
+    dilationMatrix = np.dstack(dilationList)
+    dilationMatrix = np.rollaxis(dilationMatrix,-1)
+
+    return processMatrix,dilationMatrix
+
+
+@jit()
+def histogramMaker(array):
+    #fig = plt.figure(figsize=(6,6))
+    # for i in range(shape[0]):
+    #     plt.hist(array[i,:,:], bins=5)
+    #     plt.show()
+    n, bins, patches = plt.hist(array[1,:,:])
+    #plt.show()
+    print(bins)
+    #return n
+
+
+@jit()
+def porcentageCalculatorLung(maskArray,dilationArray, maskShape, dilationShape):
+    counter = 0
+    counterList = []
+    porcentageList = []
+    for i in range(maskShape[0]):
+        
+        counter += 1
+        
+        air = maskArray[i, :, :]
+        dim = np.shape(air)
+        for m in range(dim[0]):
+            for n in range(dim[1]):
+                if air[m][n] < 0.5:
+                    air[m][n] = 0
+        
+        m,n = 0,0
+        
+        dilation = dilationArray[i, :, :]
+        dim2 = np.shape(dilation)
+        for m in range(dim2[0]):
+            for n in range(dim2[1]):
+                if dilation[m][n] < 0.5:
+                    dilation[m][n] = 0       
+        suma = np.sum(air,axis=0)
+        suma2 = sum(suma)
+        suma3 = np.sum(dilation,axis=0)
+        suma4 = sum(suma3)
+
+        relacionAB = suma2/suma4
+        porcentageList.append(relacionAB)
+        counterList.append(counter)
+        unionArray = np.dstack([counterList,porcentageList])
+    
+    print(np.shape(unionArray))
+    return unionArray
+
+
+@jit()
+def pandaMatrixManipulator(array, lowboundry, highboundry):
+    shape = np.shape(array)
+    array = np.reshape(array, (shape[1], shape[2]))
+    columns = ["imgNum", "porcentage"]
+    df = pd.DataFrame(array, columns=columns)
+    df = df[(df.porcentage > lowboundry) & (df.porcentage < highboundry)]
+    matrix = df.to_numpy()
+    return matrix
+
+
+@jit()
+def imageEliminator(porcentageData,resampledMatrix):
+    reference = porcentageData[:, 0]
+    array = resampledMatrix
+    
+
+
+    pass

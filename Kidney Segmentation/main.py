@@ -33,6 +33,7 @@ from plotly.graph_objs import *
 from gui import *
 from myshow import myshow, myshow3d
 from methods import *
+from numba import jit, cuda, vectorize
 
 
 def main():
@@ -47,12 +48,29 @@ def main():
     
     print("Resampled Volumetric Matrix Shape = " + str(resampledShape))
 
-    processedMatrix = lungMaskMatrixGenerator(resampledMatrix)
+    processedMatrix, dilationMatrix = lungMaskMatrixGenerator(resampledMatrix,False)
     processedMatrixShape = np.shape(processedMatrix)
+    dilationMatrixShape = np.shape(dilationMatrix)
+    
     print("Shape processedMatrix = " + str(processedMatrixShape))
+    print("Dilation Matrix Shape = " + str(dilationMatrixShape))
+    
+    #for x in range(processedMatrixShape[0]):
+        #image = sitk.GetImageFromArray(processedMatrix[x,:,:])
+        #myshow(image)
+    #for n in range(processedMatrixShape[0]):
+        #histogramMaker(processedMatrix)
+    
+    """plt.hist(dilationMatrix[1, :, :])
+    plt.show()
+    plt.hist(processedMatrix[1, :, :])
+    plt.show()"""
+    
+    unionArray = porcentageCalculatorLung(processedMatrix, dilationMatrix, processedMatrixShape, dilationMatrixShape)
+    
 
-    for x in range(processedMatrixShape[0]):
-        image = sitk.GetImageFromArray(processedMatrix[x,:,:])
-        myshow(image)
-
-main()
+    scoutMatrix = pandaMatrixManipulator(unionArray, lowboundry=0.01, highboundry=0.15)
+    print(np.shape(scoutMatrix))
+    print(scoutMatrix)
+if __name__ == "__main__":
+    main()
