@@ -19,7 +19,6 @@ from skimage import measure
 from sklearn import cluster
 from class_dicom import ObjetoDicom
 from scipy.ndimage.filters import gaussian_filter
-import guiqwt
 import SimpleITK as sitk
 import scipy.ndimage
 from sklearn.cluster import KMeans
@@ -69,8 +68,14 @@ def main():
     unionArray = porcentageCalculatorLung(processedMatrix, dilationMatrix, processedMatrixShape, dilationMatrixShape)
     
 
-    scoutMatrix = pandaMatrixManipulator(unionArray, lowboundry=0.01, highboundry=0.15)
+    scoutMatrix = pandaMatrixManipulator(unionArray, lowboundry=0.01, highboundry=0.145)
     print(np.shape(scoutMatrix))
-    print(scoutMatrix)
+    #print(scoutMatrix)
+    postProcessedMatrix = imageEliminator(scoutMatrix,resampledMatrix,sliceThickness)
+
+    #print(np.shape(postProcessedMatrix))
+    #array2Image(postProcessedMatrix)
+
+
 if __name__ == "__main__":
     main()

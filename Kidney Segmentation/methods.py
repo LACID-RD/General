@@ -19,7 +19,6 @@ from skimage import measure
 from sklearn import cluster
 from class_dicom import ObjetoDicom
 from scipy.ndimage.filters import gaussian_filter
-import guiqwt
 import SimpleITK as sitk
 import scipy.ndimage
 from sklearn.cluster import KMeans
@@ -54,13 +53,13 @@ def multiplicableMask(pixelArray):
 
 
 
-@jit()
+#@jit()
 def getHoundfieldArray(dcm):
     arrayHU = (dcm.pixel_array*dcm.RescaleSlope) + dcm.RescaleIntercept
     return arrayHU
 
 
-@jit()
+##@jit()
 def volHUMatrixGenerator():
 
     #Variables
@@ -112,7 +111,7 @@ def volHUMatrixGenerator():
     return vol_HU_matrix, sliceThickness, pixelSpacing
 
 
-@jit()
+#@jit()
 def listOf2DMatrixTo3DMatrixGenerator(array):
     shape = np.shape(array)
     matrix3D = np.dstack(array)
@@ -120,7 +119,7 @@ def listOf2DMatrixTo3DMatrixGenerator(array):
     return matrix3D,shape
 
 
-@jit()
+#@jit()
 def resampling(matrix_HU,sliceThickness,pixelSpacing):
     resampledArrayList = []
 
@@ -149,7 +148,7 @@ def resampling(matrix_HU,sliceThickness,pixelSpacing):
     return resampledMatrix
 
 
-@jit()
+#@jit()
 def makeLungMasks(img, display=False):
     row_size = img.shape[0]
     col_size = img.shape[1]
@@ -230,7 +229,7 @@ def makeLungMasks(img, display=False):
     return mask,dilation
 
 
-@jit()
+#@jit()
 def lungMaskMatrixGenerator(resampledMatrix,display):
 
     shapeIter = np.shape(resampledMatrix)
@@ -250,7 +249,7 @@ def lungMaskMatrixGenerator(resampledMatrix,display):
     return processMatrix,dilationMatrix
 
 
-@jit()
+#@jit()
 def histogramMaker(array):
     #fig = plt.figure(figsize=(6,6))
     # for i in range(shape[0]):
@@ -262,7 +261,7 @@ def histogramMaker(array):
     #return n
 
 
-@jit()
+#@jit()
 def porcentageCalculatorLung(maskArray,dilationArray, maskShape, dilationShape):
     counter = 0
     counterList = []
@@ -300,22 +299,56 @@ def porcentageCalculatorLung(maskArray,dilationArray, maskShape, dilationShape):
     return unionArray
 
 
-@jit()
+#@jit()
 def pandaMatrixManipulator(array, lowboundry, highboundry):
     shape = np.shape(array)
     array = np.reshape(array, (shape[1], shape[2]))
     columns = ["imgNum", "porcentage"]
     df = pd.DataFrame(array, columns=columns)
     df = df[(df.porcentage > lowboundry) & (df.porcentage < highboundry)]
+    #print(df)
     matrix = df.to_numpy()
     return matrix
 
 
-@jit()
-def imageEliminator(porcentageData,resampledMatrix):
+#@jit()
+def imageEliminator(porcentageData,resampledMatrix,sliceThickness):
+    i, x = 0, 0
+    matList = []
+
     reference = porcentageData[:, 0]
-    array = resampledMatrix
+    array = np.copy(resampledMatrix)
+    shape = np.shape(array)
+
+    for x in np.nditer(reference):
+        index = int(x)
+        image = array[index,:,:]
+        matList.append(image)
+
+    matrix = np.dstack(matList)
+    matrix = np.rollaxis(matrix,-1)
+    print(np.shape(matrix))
+
+    sliceThickness = int(sliceThickness)
+    conversionMM = sliceThickness/10 #[mm]
+    imagesPerCM = (10/conversionMM)/10
+
+    ## MODIFICABLE ##
+
+    distancia = 41
     
+    imgCons = distancia*imagesPerCM
+    imgCons = int(imgCons)
+    matrix = matrix[0:imgCons,:,:]
+    print(np.shape(matrix))
+    with open("postProcessMat.npy","wb") as f:
+        np.save(f,matrix)
+    
+    return matrix
 
-
-    pass
+def array2Image(array):
+    shape = np.shape(array)
+    for i in range(shape[0]):
+        image = sitk.GetImageFromArray
+        plt.imshow(image)
+        plt.imshow

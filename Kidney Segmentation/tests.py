@@ -50,14 +50,72 @@ mat = np.dstack(union)
 # print(mat)
 
 
-def pandaMatrixManipulator(array,lowboundry,highboundry):
-    shape =np.shape(array)
-    array = np.reshape(array, (shape[1], shape[2]))
-    columns = ["imgNum", "porcentage"]
-    df = pd.DataFrame(array,columns=columns)
-    df = df[(df.porcentage > lowboundry) & (df.porcentage < highboundry)]
-    matrix = df.to_numpy()
+# def pandaMatrixManipulator(array,lowboundry,highboundry):
+#     shape =np.shape(array)
+#     array = np.reshape(array, (shape[1], shape[2]))
+#     columns = ["imgNum", "porcentage"]
+#     df = pd.DataFrame(array,columns=columns)
+#     df = df[(df.porcentage > lowboundry) & (df.porcentage < highboundry)]
+#     matrix = df.to_numpy()
+#     return matrix
+
+
+# pandaMatrixManipulator(mat)
+
+
+
+
+
+# i = 0
+# z = 1227
+# theList = np.array([i for i in range(1,z + 1)])
+# print(len(theList))
+# print(theList)
+# print(np.shape(np.vstack(theList)))
+
+porcentageData = np.array(np.vstack([i for i in range(50,101)]))
+#print(np.shape(porcentageData))
+
+resampledMatrix = np.ones((500,100,100))
+shaper = (np.shape(resampledMatrix))
+
+zList = np.array(np.vstack([i for i in range(shaper[0])]))
+#print(np.shape(zList))
+
+ref = porcentageData[:, 0]
+#print(np.shape(ref))
+#print(type(ref))
+ref = list(ref)
+#print(np.shape(ref))
+#print(type(ref))
+#print(ref)
+
+
+# indexL = (reference[x])
+# string = [str(indexL) for n in indexL]
+# aString = "".join(string)
+# index = int(aString)
+
+def imageEliminator(porcentageData,resampledMatrix):
+    i, x, n = 0, 0, 0
+    matList = []
+
+    reference = porcentageData[:, 0]
+    array = np.copy(resampledMatrix)
+    shape = np.shape(array)
+
+    for x in np.nditer(reference):
+        index = int(x)
+        image = array[index,:,:]
+        matList.append(image)
+
+    matrix = np.dstack(matList)
+    matrix = np.rollaxis(matrix,-1)
+    print(np.shape(matrix))
+    
     return matrix
+    
 
 
-pandaMatrixManipulator(mat)
+
+imageEliminator(porcentageData,resampledMatrix)
