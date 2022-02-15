@@ -315,6 +315,7 @@ def pandaMatrixManipulator(array, lowboundry, highboundry):
 def imageEliminator(porcentageData,resampledMatrix,sliceThickness):
     i, x = 0, 0
     matList = []
+    cropList = []
 
     reference = porcentageData[:, 0]
     array = np.copy(resampledMatrix)
@@ -335,16 +336,32 @@ def imageEliminator(porcentageData,resampledMatrix,sliceThickness):
 
     ## MODIFICABLE ##
 
-    distancia = 41
-    
+    distancia = 20
+    distancia = distancia*int(sliceThickness)
     imgCons = distancia*imagesPerCM
     imgCons = int(imgCons)
     matrix = matrix[0:imgCons,:,:]
-    print(np.shape(matrix))
+    shape = np.shape(matrix)
+    print(shape)
+    print("JUANCARLO")
+    ## RESHAPER ##
+   
+    for i in range(shape[0]):
+        print()
+        arr = matrix[i,:,:]
+        voxel = int(shape[1])
+        val = 50
+        rest = voxel - val
+        arr = arr[val:rest][val:rest]
+        cropList.append(arr)
+    arr = np.dstack(cropList)
+    arr = np.rollaxis(matrix,-1)
+    print(np.shape(arr))
+
     with open("postProcessMat.npy","wb") as f:
-        np.save(f,matrix)
+        np.save(f,arr)
     
-    return matrix
+    return arr
 
 def array2Image(array):
     shape = np.shape(array)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from turtle import pos
 import pydicom as dicom
 import tkinter as tk
 from tkinter import filedialog
@@ -66,13 +67,13 @@ def main():
     plt.show()"""
     
     unionArray = porcentageCalculatorLung(processedMatrix, dilationMatrix, processedMatrixShape, dilationMatrixShape)
-    
-
+    print("JUAN 1")
     scoutMatrix = pandaMatrixManipulator(unionArray, lowboundry=0.01, highboundry=0.145)
     print(np.shape(scoutMatrix))
     #print(scoutMatrix)
+    print("Juan 2")
     postProcessedMatrix = imageEliminator(scoutMatrix,resampledMatrix,sliceThickness)
-
+    print(np.shape(postProcessedMatrix))
     #print(np.shape(postProcessedMatrix))
     #array2Image(postProcessedMatrix)
 
