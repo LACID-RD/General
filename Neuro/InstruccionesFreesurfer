@@ -1,0 +1,62 @@
+Cada vez que se va a usar Freesurfer se lo debe iniciar.
+
+Si se quieren correr varios sujetos en paralelo (Recomendable), se hace para iniciarlo:
+
+>> export FREESURFER_HOME=/home/clisazo/freesurfer/
+>> source $FREESURFER_HOME/SetUpFreeSurfer.sh 
+
+Ir a la carpeta donde están los T1 niftis de todos los sujetos a procesar
+Luego:
+>> ls *.nii.gz | parallel --jobs 8 recon-all -s {.} -i {} -all -qcache
+o (segun extension de los archivos, si estan comprimidos o no)
+>> ls *.nii | parallel --jobs 8 recon-all -s {.} -i {} -all -qcache
+
+Si en cambio se quiere hacer uno solo, hay que cambiar la terminal de bash a tcsh, tipeando tcsh en la terminal. Luego se inicia FS haciendo:
+
+>> setenv FREESURFER_HOME /home/clisazo/freesurfer
+>> source $FREESURFER_HOME/SetUpFreeSurfer.csh
+
+y luego:
+navigate to the directory that contains the wT1 
+>> recon-all -s subject_name -i T1w_file.nii -all -qcache
+
+TODOS LOS RESULTADOS SE GUARDAN POR DEFAULT EN LA CARPETA home/freesurfer/subjects
+
+Ejemplo de líneas de comando para visualizar algunos de los resultados:
+freeview -v \
+Alemanno/mri/T1.mgz \
+Alemanno/mri/wm.mgz \
+Alemanno/mri/brainmask.mgz \
+Alemanno/mri/aseg.mgz:colormap=lut:opacity=0.2 \
+-f Alemanno/surf/lh.white:edgecolor=blue \
+Alemanno/surf/lh.pial:edgecolor=red \
+Alemanno/surf/rh.white:edgecolor=blue \
+Alemanno/surf/rh.pial:edgecolor=red
+
+
+freeview -f Alemanno/surf/lh.pial:annot=aparc.annot:name=pial_apparc:visible=0 \
+Alemanno/surf/lh.pial:annot=aparc.a2009s.annot:name=pial_aparc_des:visible=0 \
+Alemanno/surf/lh.inflated:overlay=lh.thickness:overlay_threshold=0.1,3::name=inflated_thickness:visible=0 \
+Alemanno/surf/lh.inflated:visible=0 \
+Alemanno/surf/lh.white:visible=0 \
+Alemanno/surf/lh.pial \
+--viewport 3d
+
+
+Para convertir las mediciones realizadas para la segmentación Freesurfer de un número de sujetos en una única tabla:
+
+iniciar Freesurfer:
+export FREESURFER_HOME=/home/clisazo/freesurfer/
+source $FREESURFER_HOME/SetUpFreeSurfer.sh 
+
+asegstats2table --subjects sujeto1 sujeto2 sujeto3 sujeto4 --meas volume --tablefile aseg_stats.txt 
+
+This will combine the aseg.stats file for the subjects sujeto1, sujeto2, sujeto3, and sujeto4 to generate one table, aseg_stats.txt, that will report the volumes of all the structures labeled in aseg.mgz. The resulting file can be imported into any spreadsheet program.
+
+ES IMPORTANTE que los nombres de los sujetos se encuentren IGUAL que como están en la carpeta /home/clisazo/freesurfer/subjects
+
+Se pueden agregar:
+
+The --transpose flag writes the transpose of the table. This might be a useful way to see the table when the number of subjects is relatively less than the number of segmentations.
+
+The --delimiter option controls what character comes between the measures in the table. Valid options are tab (default), comma, space and semicolon.

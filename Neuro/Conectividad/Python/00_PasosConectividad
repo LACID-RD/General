@@ -1,0 +1,48 @@
+EN ESTE TXT SE EXPLICAN TODOS LOS PASOS A SEGUIR PARA OBTENER Y PROCESAR LAS MATRICES DE CONECTIVIDAD A FIN DE ADAPTARLAS PARA INGRESARLAS LUEGO AL CÓDIGO DE IA.
+
+1. Se corre la tracto con FSL con el script process_gpu.sh (se necesita tener en la carpeta la difu llamada DWIwc.nii, el T1 (wT1.nii), el aal2.nii.gz y el script con el directorio correcto en el último paso). Ver instrucciones para correr FSL en el txt PasosTractoFSL.
+
+2. Se corre CONN cambiando el atlas (ver txt de instrucciones CONN), usando el T1 nii y la fMRI nii. Se genera un archivo XX_conn.csv de 120x123).
+
+3. Se corre Freesurfer con el T1 (ver instrucciones Freesurfer).
+
+4. Se corre código python llamado 'Connectivity_structural_triangular_V2.py', al que hay que ingresarle el número de sujeto, y seleccionar primero la fdt_network_matrix y segundo el waytotal (generados en FSL). Para que funcione bien antes se tiene que armar una carpeta para cada sujeto cuyo nombre sea sólo el número de sujeto.
+
+5. Se corre código 'sacarcolumnas.py', que elimina las últimas 3 columnas del XX_conn.csv (pasa de ser de 120x123 a 120x120). Pide ingresar el número de sujeto y el XX_conn.csv. Se genera un archivo XX_conn_cuadrada.csv, que se guarda automáticamente en la carpeta del correspondiente sujeto.
+
+6. Se corre el código 'Connectivity_fMRI_triangular_V2.py', ingresando el número del sujeto y el archivo XX_conn_cuadrada.csv'.
+
+7. Una vez que se tienen las matrices procesadas de todos los sujeto, se corre el comando asegstats2table (ver instrucciones Freesurfer). Va a salir un archivo txt que combina las segmentaciones de Freesurfer de todos los sujetos en una única tabla. Abrir el archivo en Excel (se importa con tab como separadores y se seleccionan todas las columnas poniéndole como tipo de datos texto, NO general ni número, porque sino después el pandas se buggea leyendolo). Exportar como csv.
+
+8. Correr código 'ArmarTabla.py' (toma como entradas la lista estructural, la lista funcional y el aseg_stats.csv; además pide ingresar datos como el sexo, la edad y el orden del paciente dentro de la tabla general de aseg_stats.csv.
+
+9. Una vez obtenidas todas las tablas de cada sujeto, copiarlas todas a una carpeta Tablas
+
+10. Correr el código 'TablaGeneral.py' (al que se le ingresan todas las tablas de pacientes y controles). ANTES modificarlo para agregarle los dataframes de pacientes nuevos.
+
+11. Correr código 'LimpiaTablaGeneral.py'
+
+12. Correr código Machine Learning.
+
+Las tablas terminan teniendo los siguientes elementos:
+- Cada fila es un sujeto
+- Columnas: 4371 de conectividad estructural + 4371 de conectividad funcional + 64 T1 Freesurfer + Salida (si el sujeto es control, epilepsia temporal o no temporal) + Sexo + Edad. Es decir, columnas 0-8805 son de SC, FC y T1; la 8806 es la salida, la 8807 el sexo y la 8808 la edad.
+
+El directorio queda organizado de la siguiente manera:
+
+Directorio General
+	01 #Esta es la carpeta del sujeto 01
+		01_fdt_network_matrix
+		01_waytotal
+		01_conn.csv
+		#Y a medida que se vayan corriendo los códigos se van guardando acá todos los resultados
+	XX #Esta es la carpeta del sujeto XX
+		Archivos sujeto XX
+	Connectivity_structural_triangular_V2.py
+	sacarcolumnas.py
+	Connectivity_fMRI_triangular_V2.py
+	ArmarTabla.py
+	TablaGeneral.py
+	LimpiaTablaGeneral.py
+	Tablas
+		Acá adentro se pega la tabla de todos los sujetos una vez que se terminaron de correr todos los códigos hasta el paso 8, para que sea más fácil en el paso 10 seleccionar todas las tablas.

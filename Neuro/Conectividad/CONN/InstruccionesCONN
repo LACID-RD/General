@@ -1,0 +1,22 @@
+CONN Toolbox (corre en Matlab)
+
+1. Especificar el tiempo de repetición y el número de sujetos a analizar.
+2. Cargar los T1 en la pestaña 'Structural'
+3. Cargar las funcionales en la pestaña 'Functional'
+4. Modificar el atlas que se considerará para las semillas de la conectividad. Ir a la pestaña ROIs. Click en atlas, apretar el signo - de abajo para borrarlo. Hacer lo mismo con networks. Solo debe quedar Grey Matter, White Matter, CSF y aal2. Si no aparece aal2 es porque no está configurado el atlas. Se deben copiar los archivos aal2.nii.gz y el txt que tiene los nombres de las regiones (los voy a subir a esta misma carpeta) en la carpeta conn/rois.
+
+5. Click en el botón Preprocessing, en la esquina inferior izquierda.
+	Elegir "default preprocessing pipeline for volume-based analyses (direct normalization to MNI..."
+	Seleccionar el orden de las slices (nosotros adquirimos ascending; en caso de usar los de Human Connectome se selecciona Siemens interleaved)
+	Use intermediate settings (97th percentiles in normative ...)
+	Segment/Normalize/Resample settings: elegir las opciones por default
+	Smoothing kernel: 8 mm
+6. Una vez que finaliza el preprocessing (tarda bastante), click en "Done", abajo a la izquierda.
+7. Denoising: dejar las opciones por default y dar OK
+Todo lo que sigue es por default, hacer el first-level results seleccionando SBC (seed-based connectivity)
+
+Una vez que se termina todo el proceso, en Matlab hay que ir a la carpeta del sujeto: proyecto->results->first level->SBC y en la línea de comando hacer:
+	>> load('resultsROI_Subject001_Condition001.mat')
+	>> csvwrite('nombrepaciente_conn.csv',Z)
+	
+Ese archivo 'nombrepaciente_conn.csv' que se genera, copiarlo y pegarlo en la carpeta del sujeto donde se va a correr todo lo de python.
