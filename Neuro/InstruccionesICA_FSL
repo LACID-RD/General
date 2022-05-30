@@ -1,0 +1,15 @@
+Crear carpeta ICA dentro de la carpeta del sujeto.
+Abrir MELODIC en FSL (GUI)
+Input: Select 4D data -> elegir la fMRI nii
+Output directory: seleccionar la carpeta ICA
+Prestats: Slice timing correction-> Regular up
+Registration: seleccionar el T1 nii del paciente
+Correr: GO
+
+Abrir en el navegador cada uno de los volúmenes que se generaron. Analizar cada uno y encontrar las redes. En un excel o drive ir anotando:
+	MELODIC | Network | Folder (MELODIC-1)
+	
+En la terminal ir con cd hasta la carpeta ICA.ica, luego meterse a la carpeta filtered_func_data.ica.
+Ahí usar el comando >>fslsplit melodic_IC.nii.gz (Esto saca a todos los volúmenes y los numera de 0 a n-1)
+
+Seleccionar los volúmenes que se habían anotado y copiarlos a una carpeta afuera más accesible. Cargarlos a Slicer y analizarlos.

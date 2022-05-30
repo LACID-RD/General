@@ -1,0 +1,5 @@
+Para hacer la tracto en FSL, armar una carpeta del sujeto que debe contener el script process_gpu.sh (asegurarse de cambiar el directorio del último paso antes de correr). 
+
+Este script sirve para obtener modelo ball and stick y posterior matriz de conectividad para imágenes DWI corregidas por eddy current. Funciona en FSL versión 6 con GPU. Debe encontrarse en la carpeta del paciente, junto con el archivo de la difusión (llamado DWIwc.nii), los archivos .bval y .bvec, el T1 (denominado wT1.nii) y el archivo aal2.nii.gz. Asegurarse de modificar el directorio del probtrackx2_gpu (último paso) con la carpeta del paciente que corresponda antes de correr.
+
+Después simplemente se corre en bash el script. Cuando finaliza, ir a la carpeta track2 y copiar los archivos fdt_network_matrix y waytotal, y pegarlos en la carpeta del sujeto donde se va a correr lo de python.
