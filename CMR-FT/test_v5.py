@@ -1,4 +1,7 @@
+from ast import Raise
 from itertools import count
+import itertools
+from logging import raiseExceptions
 from lucaskanadev1 import *
 from array_generator_cardio import *
 import SimpleITK as sitk
@@ -115,6 +118,71 @@ def canny_detector(arr, lower, upper, variance, error):
     return cannyArr
 
 
+def gradients_IxIy(arr, size):
+    #3x3
+    #Ix
+    ker1 = np.array([[0, 0, 0],
+                     [0, -1, 1],
+                     [0, 0, 0]])
+    #Iy    
+    ker2 = np.array([[0, 0, 0],
+                     [0, -1, 0],
+                     [0, 1, 0]])
+    #5x5
+    #Ix
+    ker3 = np.array([[0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0],
+                     [0, 0, -1, 1, 1],
+                     [0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0]])
+    #Iy
+    ker4 = np.array([[0, 0, 0, 0, 0],
+                     [0, 0, 0, 0, 0],
+                     [0, 0, -1, 0, 0],
+                     [0, 0, 1, 0, 0],
+                     [0, 0, 1, 0, 0]])
+    
+    if size == 3:
+        Ix = convolve2d(arr, ker1, mode='same')
+        Iy = convolve2d(arr, ker2, mode='same')
+    if size == 5:
+        Ix = convolve2d(arr, ker3, mode='same')
+        Iy = convolve2d(arr, ker4, mode='same')       
+    
+    return Ix, Iy
+
+
+def gradient_It(arr1, arr2):
+    
+    It = np.subtract(arr2, arr1)
+    
+    return It
+
+
+def lucas_kanade(arr1, arr2):
+    
+    #Grab two equally sized arrays
+    shape1, shape2 = np.shape(arr1), np.shape(arr2)
+    if (shape1 != shape2):
+        raise Exception('Arrs should be same size.')
+    else:
+        #Compute Ix, Iy, It gradients
+        Ix1 = gradients_IxIy(arr1)
+        Iy1 = gradients_IxIy(arr2)
+        It = gradient_It(arr1, arr2)
+        
+        for i in range(shape1[0]):
+            for j in range(shape1[1]):
+                
+                
+                pass
+        pass
+    
+    
+    
+    return
+
+
 #Generamos una lista de pixel arrays y una lista de los objetos de cada img
 tensors, objList = array_generator_cardio()
 
@@ -140,6 +208,53 @@ x1, y1, x2, y2 = int(roi[0]), int(roi[1]), int(roi[2]), int(roi[3])
 newList = []
 
 
+class Manipulator(Study):
+    def __init__(self, slice, img, cardPhase, path, Ix, Iy, It, cropped):
+        super().__init__(slice, img, cardPhase, path)
+        self.cropped = cropped
+        self.Ix = Ix
+        self.Iy = Iy
+        self.It = It
+    
+    def cropper(x1, x2, y1, y2):
+        cropped = arr[y1:int(y1 + y2), x1:int(x1 + x2)]
+        
+        return cropped
+     
+    def gradients_IxIy(arr, size):
+    #3x3
+    #Ix
+        ker1 = np.array([[0, 0, 0],
+                        [0, -1, 1],
+                        [0, 0, 0]])
+        #Iy    
+        ker2 = np.array([[0, 0, 0],
+                        [0, -1, 0],
+                        [0, 1, 0]])
+        #5x5
+        #Ix
+        ker3 = np.array([[0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0],
+                        [0, 0, -1, 1, 1],
+                        [0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0]])
+        #Iy
+        ker4 = np.array([[0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0],
+                        [0, 0, -1, 0, 0],
+                        [0, 0, 1, 0, 0],
+                        [0, 0, 1, 0, 0]])
+        
+        if size == 3:
+            Ix = convolve2d(arr, ker1, mode='same')
+            Iy = convolve2d(arr, ker2, mode='same')
+        if size == 5:
+            Ix = convolve2d(arr, ker3, mode='same')
+            Iy = convolve2d(arr, ker4, mode='same')       
+    
+        return Ix, Iy
+
+
 for n in objList:
     arr = n.img
     newArr = arr[y1:int(y1 + y2), x1:int(x1 + x2)]
@@ -148,6 +263,8 @@ for n in objList:
     blur = gaussian_blur(norm, 3, 3)
     sobel = sobel_filter(blur)
     sharp = edge_sharp(norm)
+    
+    Ix, Iy = gradients_IxIy(norm, 3)
     
     thresh = sitk_threshold(blur, lower=-0.6, upper=0.6, outside=0, inside=255)
     thresh = sitk.GetArrayFromImage(thresh)
@@ -169,12 +286,34 @@ for n in objList:
     setattr(n, 'multiplied', multiplied)
     setattr(n, 'canny', canny)
     setattr(n, 'norm', norm)
+    setattr(n, 'Ix', Ix)
+    setattr(n, 'Iy', Iy)
 
     newList.append(n)
     #print(np.shape(arr), np.shape(newArr))
-    #img = myshow(sitk.GetImageFromArray(newArr), cmap=plt.cm.bone)
+    #img = myshow(sitk.GetImageFromArray(newArr), cmap=plt.cm.bone)    
+n = 0
+lkList = []
+iterlist = list(itertools.pairwise(objList))
+#print(iterlist)
+
+
+class lk(Study):
+    def __init__(self, slice, img, cardPhase, path):
+        super().__init__(slice, img, cardPhase, path)
+        
+
+
+for n in iterlist:
+    obj1 = n[0]
+    obj2 = n[1]
+    It = gradient_It(obj1, obj2)
     
-     
+    
+    
+    pass
+
+
 #Un atributo de cada objeto es el numero de phase cardiacas (esto te reeordena los objetitos)
 cardPhase = int((newList[0]).cardPhase)
 totalCardiacCycles = int(totalOfImages/cardPhase)
@@ -184,7 +323,6 @@ print("Cantidad de fases cardiacas = ", totalCardiacCycles)
 splitedList = np.array_split(newList, totalCardiacCycles)
 
 print(np.shape(tensors))
-
 
 def plot():
     n=1
@@ -204,6 +342,8 @@ def plot():
         #sobel2Arr = np.multiply(10000000, sobel2Arr)
         normArr = i.norm
         
+        IxArr = i.Ix
+        IyArr = i.Iy
         
         originalImg = sitk.GetImageFromArray(originalArr)
         sobelImg = sitk.GetImageFromArray(sobelArr)
@@ -215,6 +355,9 @@ def plot():
         normImg = sitk.GetImageFromArray(normArr)
         contourImg = sitk.GetImageFromArray(contourArr)
         
+        Ix = sitk.GetImageFromArray(IxArr)
+        Iy = sitk.GetImageFromArray(IyArr)
+        
         myshow(originalImg, cmap=plt.cm.bone)
         #myshow(sobelImg, cmap=plt.cm.bone)
         #myshow(substractedImg, cmap=plt.cm.bone)
@@ -222,8 +365,10 @@ def plot():
         myshow(threshImg, cmap=plt.cm.bone)
         myshow(contourImg, cmap=plt.cm.bone)
         #myshow(cannyImg, cmap=plt.cm.bone)
+        myshow(Ix, cmap=plt.cm.bone)
+        myshow(Iy, cmap=plt.cm.bone)
 
-plot()  
+#plot()  
 
 
 

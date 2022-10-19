@@ -19,24 +19,21 @@ from scipy.signal import convolve2d
 
 
 class Study:
-    def __init__ (self, slice, img, cardPhase, path, cropped,
-                  Ix, Iy):
+    def __init__ (self, slice, img, cardPhase, path):
         self.slice = slice
         self.img = img
         self.cardPhase = cardPhase
         self.path = path
-        self.cropped = cropped
-        self.Ix = Ix
-        self.Iy = Iy
     
     
-    def crop_array(self, arr, roi):
-        x1, x2, y1, y2 = int(roi[0]), int(roi[1]), int(roi[2]), int(roi[3])
-        crop = arr[y1:int(y1 + y2), x1:int(x1 + x2)]
-        return crop
+    def cropper():
+        
+        
+        
+        return
     
         
-    def gradients_IxIy(self, arr, size):
+    def gradients_IxIy(arr, size):
     #3x3
     #Ix
         ker1 = np.array([[0, 0, 0],
@@ -67,23 +64,9 @@ class Study:
             Ix = convolve2d(arr, ker3, mode='same')
             Iy = convolve2d(arr, ker4, mode='same')       
         
-        gradients = (Ix, Iy)
+        gradients = tuple(Ix, Iy)
         
         return gradients
-    
-    def normalize_image(self, arr):
-        img = sitk.GetImageFromArray(arr)
-        #img = sitk.Cast(img, sitk.sitkFloat32)
-        n = sitk.NormalizeImageFilter()
-        normalize = n.Execute(img)
-        normalize = sitk.GetArrayFromImage(normalize)
-        
-        return normalize
-
-
-
-
-
 
 
 def laplacian(arr):
@@ -131,7 +114,7 @@ def array_generator_cardio():
         #sobel = sobel_filter(dcm.pixel_array)
         
         image_list[img_qtt] = Study(dcm[0x0020, 0x1041].value, np.copy(dcm.pixel_array),
-                                    dcm[0x0018, 0x1090].value, path, None, None, None) # Lista de objetos tipo image
+                                    dcm[0x0018, 0x1090].value, path) # Lista de objetos tipo image
         
         dcm_im_all.append(dcm.pixel_array)
         img_qtt = img_qtt + 1
