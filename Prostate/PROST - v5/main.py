@@ -54,5 +54,22 @@ for i in bvalList:
 # Arr de 3 listas, cada lista tiene todas las imagenes de cada b val.
 bvalSplit = np.array_split(auxList, numOfBvalues)
 
-print('splitted b val list len: ', len(bvalSplit))
+## ROI sobre las imagenes.
 
+for i in bvalSplit:
+    listLen = len(i)
+    midImg = int(listLen/2)
+    
+    refImg = i[midImg].img
+    refImg = refImg.astype(np.uint8)
+    
+    roi = cv.selectROI('Select a prostate ROI', refImg)
+    print('Selected ROI:', roi)
+    cv.destroyAllWindows()
+    
+    for j in i:
+        img = np.array(j.img)
+        cropArr = j.crop_array(img, roi)
+        setattr(j, 'cropArr', cropArr)
+            
+    

@@ -17,6 +17,11 @@ class Study:
         self.path = path
         self.bvalue = bvalue
         self.imgPerBvalue = imgPerBvalue
+        
+    def crop_array(self, arr, roi):
+        crop = arr[int(roi[1]):int(roi[1] + roi[3]), 
+                   int(roi[0]):int(roi[0] + roi[2])]
+        return crop
 
 
 def obj_loader():
