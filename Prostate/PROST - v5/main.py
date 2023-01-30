@@ -31,7 +31,6 @@ print('Img quantity per bvalue:', imgPerBvalue)
 splitList = np.array_split(objectList, imgPerBvalue)
 #print('Shape of bvalues sub-list', np.shape(splitList))
 
-
 ## LISTA DE LISTAS, cada sublista son todas las imagenes de cada bval.
 bvalSortedList = list()
 bvalList = list()
@@ -53,23 +52,31 @@ for i in bvalList:
 
 # Arr de 3 listas, cada lista tiene todas las imagenes de cada b val.
 bvalSplit = np.array_split(auxList, numOfBvalues)
-
+           
 ## ROI sobre las imagenes.
+# Version un ROI para todos los b-val
 
-for i in bvalSplit:
-    listLen = len(i)
-    midImg = int(listLen/2)
-    
-    refImg = i[midImg].img
-    refImg = refImg.astype(np.uint8)
-    
-    roi = cv.selectROI('Select a prostate ROI', refImg)
-    print('Selected ROI:', roi)
-    cv.destroyAllWindows()
-    
-    for j in i:
+ref = bvalSplit[0]
+refImg = ref[int(len(ref)/2)].img
+refImg = refImg.astype(np.uint8)
+
+roi = cv.selectROI('Select a prostate ROI', refImg)
+print('Selected ROI:', roi)
+cv.destroyAllWindows()
+
+for _ in bvalSplit:
+    for j in _:
         img = np.array(j.img)
         cropArr = j.crop_array(img, roi)
         setattr(j, 'cropArr', cropArr)
-            
-    
+        normCropArr = j.normalize_image(cropArr)
+        setattr(j, 'normCropArr', normCropArr)
+        
+### Grafico Crudo para chekar que las img esten ordenadas.
+
+for _ in bvalSplit:
+    for j in _:
+        img = sitk.GetImageFromArray(np.array(j.img))
+        crop = sitk.GetImageFromArray(np.array(j.cropArr))
+        #myshow(img)
+        myshow(crop)

@@ -22,6 +22,15 @@ class Study:
         crop = arr[int(roi[1]):int(roi[1] + roi[3]), 
                    int(roi[0]):int(roi[0] + roi[2])]
         return crop
+    
+    def normalize_image(self, arr):
+        img = sitk.GetImageFromArray(arr)
+        #img = sitk.Cast(img, sitk.sitkFloat32)
+        n = sitk.NormalizeImageFilter()
+        normalize = n.Execute(img)
+        normalize = sitk.GetArrayFromImage(normalize)
+        
+        return normalize
 
 
 def obj_loader():
