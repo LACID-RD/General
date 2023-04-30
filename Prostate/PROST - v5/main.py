@@ -72,11 +72,45 @@ for _ in bvalSplit:
         normCropArr = j.normalize_image(cropArr)
         setattr(j, 'normCropArr', normCropArr)
         
+
+### Eq IVIM:
+'''
+S/S0 = fexp(-bD*) + (1-f)exp(-bD + (bD)**2 * K/6)
+'''
+### Mapas de Intensidad vs B-value:
+
+# splitList es la lista cuyas sublistas son cada corte
+
+def sitk_histogram(arr):
+    img = sitk.GetImageFromArray(arr)
+    threshold = sitk.ThresholdImageFilter()
+    threshold.SetOutsideValue(0)
+    threshold.SetLower(100)
+    threshold.SetUpper(8000)
+    res = threshold.Execute(img)
+    myshow(res)
+
 ### Grafico Crudo para chekar que las img esten ordenadas.
 
 for _ in bvalSplit:
     for j in _:
-        img = sitk.GetImageFromArray(np.array(j.img))
-        crop = sitk.GetImageFromArray(np.array(j.cropArr))
-        #myshow(img)
-        myshow(crop)
+        crop = np.array(j.cropArr)
+        #sitk_histogram(crop)
+
+def map_ADC():
+    
+    return
+
+def signal_points(sliceList):
+    signalPointsList = list()
+    S0 = sliceList[0]
+    
+    for i in sliceList:
+        signalOverS0 = np.divide(i, S0)
+        signalPointsList.append(signalOverS0)
+        
+    return signalPointsList
+
+        
+for slice in splitList:
+    pass
