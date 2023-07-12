@@ -1,0 +1,6 @@
+Objetivos:
+- Manejo del Path de un archivo
+- Manejo de Tkinter para cargar archivos
+- Librería pydicom y su vínculo con matplotlib y numpy
+- Manejo de funciones
+- Histograma
