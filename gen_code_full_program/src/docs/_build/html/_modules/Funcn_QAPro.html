@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Funcn_QAPro &#8212; SRC 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=039e1c02" />
+    <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for Funcn_QAPro</h1><div class="highlight"><pre>
+<span></span><span class="c1">#from inspect import CO_ITERABLE_COROUTINE</span>
+<span class="c1">#from operator import contains</span>
+<span class="c1">#import cmath</span>
+<span class="c1">#from numpy.lib.npyio import save</span>
+<span class="c1">#from skimage.io import imread, imsave</span>
+<span class="c1">#import tkinter as tk</span>
+<span class="c1">#from tkinter import filedialog</span>
+<span class="c1">#from pydicom.uid import generate_uid</span>
+<span class="c1">#import collections</span>
+<span class="c1">#from scipy.optimize import least_squares, minpack2</span>
+<span class="c1">#import math</span>
+<span class="c1">#from lmfit import Model</span>
+<span class="c1">#from lmfit import Parameters,minimize,fit_report</span>
+<span class="c1">#from scipy.signal import lfilter, lfilter_zi, filtfilt, butter</span>
+<span class="c1">#from matplotlib.pyplot import plot, legend, show, grid, figure, savefig</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="c1">### Local libraries</span>
+<span class="c1">#from Class_Image import CImage</span>
+<span class="c1">#from Class_LoadI import CLoadI</span>
+<span class="c1">#from Class_Serie import CSerie</span>
+<span class="c1">#from Class_Study import CStudy</span>
+<span class="n">LINE_FLUSH</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r\033</span><span class="s1">[K&#39;</span>
+<span class="n">UP_FRONT_LINE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[F&#39;</span>
+<span class="c1">#ERROR_LOG = &quot; &quot;</span>
+<span class="c1">#:param user_int (int): User interaction 0) only file, 1) file/terminal, 2) only terminal, 3) none.</span>
+    
+<span class="c1">#    :type user_int: int</span>
+<div class="viewcode-block" id="ClassErrorLog">
+<a class="viewcode-back" href="../Funcn_QAPro.html#Funcn_QAPro.ClassErrorLog">[docs]</a>
+<span class="k">class</span> <span class="nc">ClassErrorLog</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class that creates and manages the error_log.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+   
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_int</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">log_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">path_log</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the constructor function.</span>
+<span class="sd">        :param log_name: Name of the error_log.</span>
+<span class="sd">        :type log_name: str</span>
+<span class="sd">    </span>
+<span class="sd">        :param path_log: Path of the error_log localization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user_int</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">user_int</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect configuration of the error log. See ClassErrorLog_init.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">=</span> <span class="n">user_int</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_name</span> <span class="o">=</span> <span class="n">log_name</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path_log</span> <span class="o">=</span> <span class="n">path_log</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path_log</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+
+<div class="viewcode-block" id="ClassErrorLog.create">
+<a class="viewcode-back" href="../Funcn_QAPro.html#Funcn_QAPro.ClassErrorLog.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method creates the file.</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_log</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">):</span>
+                <span class="k">pass</span>  <span class="c1"># Doing nothing in the block effectively clears the file if it exists</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ClassErrorLog.write">
+<a class="viewcode-back" href="../Funcn_QAPro.html#Funcn_QAPro.ClassErrorLog.write">[docs]</a>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">line_log</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method writes a line in the file</span>
+<span class="sd">        :param code: 0) error, 1) warning, 2) text</span>
+<span class="sd">        :param line_log: New line to add to the file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Output Error.&quot;</span><span class="p">,</span> <span class="n">line_log</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_log</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                    <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line_log</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Write a string to the file</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_log</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                    <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line_log</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># Write a string to the file</span>
+            <span class="k">elif</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_int</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect configuration of the error log. See ClassErrorLog_write&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+
+<span class="c1">#############################</span>
+<span class="c1"># QA Functions</span>
+<span class="c1">#############################</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">def FQA_SerieInfo_Half(series):</span>
+
+<span class="sd">    print(f&quot;{series.S02SeNu} SlTk: {series.S04SlTk}, Mat: {series.S04RwNb}x{series.S04ClNb}, PiSp: {series.S04PiSp}&quot;)</span>
+<span class="sd">    mid_index = len(series.AllImag) // 2</span>
+<span class="sd">    title = series.AllImag[mid_index].CIFTitles(0)</span>
+<span class="sd">    plt.imshow(series.AllImag[mid_index].ImgData, cmap=plt.cm.bone)</span>
+<span class="sd">    plt.title(title)</span>
+<span class="sd">    plt.show()</span>
+
+<span class="sd">###################</span>
+<span class="sd"># Series analysis</span>
+<span class="sd">###################</span>
+
+<span class="sd">def FQA_process_study(study, series_indices):</span>
+<span class="sd">    print(&quot;QA_Study:&quot;, study.StuItem, &quot;Cantidad de series:&quot;, len(series_indices), end=&quot;&quot;)</span>
+<span class="sd">    if len(series_indices) == len(study.AllSers):</span>
+<span class="sd">        print(&quot; (Todas)&quot;)</span>
+<span class="sd">    else: print(&quot;\n&quot;)</span>
+<span class="sd">    for index in series_indices:</span>
+<span class="sd">        FQA_SerieInfo_Half(study.AllSers[index])</span>
+
+<span class="sd">###################</span>
+<span class="sd"># Series QA</span>
+<span class="sd">###################</span>
+<span class="sd"># Se pueden colocar arrays de estudios y/o series</span>
+<span class="sd"># Si serie_array=0, se analizan todas las series</span>
+
+<span class="sd">def FQA_series(study_array,serie_array):</span>
+<span class="sd">    if isinstance(study_array,np.ndarray): # Si study_array es un array...</span>
+<span class="sd">        for study in study_array:</span>
+<span class="sd">            if isinstance(serie_array, np.ndarray): # Si serie_array es un array...</span>
+<span class="sd">                FQA_process_study(study, serie_array)</span>
+<span class="sd">            elif serie_array==0: # Todas las series</span>
+<span class="sd">                FQA_process_study(study, range(len(study.AllSers)))</span>
+<span class="sd">            else: print(&quot;Error: No paso QA (FQASer).&quot;); sys.exit(0)</span>
+<span class="sd">    else:</span>
+<span class="sd">        if isinstance(serie_array,np.ndarray): # Pero serie_array es un array...</span>
+<span class="sd">            FQA_process_study(study_array, serie_array)</span>
+<span class="sd">        elif serie_array==0:</span>
+<span class="sd">            FQA_process_study(study_array, range(len(study_array.AllSers)))</span>
+<span class="sd">        else: print(&quot;Error: No paso QA (FQASer).&quot;); sys.exit(0)</span>
+<span class="sd">    print(&quot;End QA_Study&quot;)</span>
+
+<span class="sd">###################</span>
+<span class="sd"># QA over libraries POO de las librerias</span>
+<span class="sd">###################</span>
+<span class="sd">#level_info: 0(no imprime), 1(Img), 2(Serie)</span>
+
+<span class="sd">def FQA_class(level_info):</span>
+<span class="sd">    qa_var = [0,0]; var_aux0 = []</span>
+<span class="sd">    for i, image in enumerate(CImage.Instanc):</span>
+<span class="sd">        var_aux0.append(image)</span>
+<span class="sd">        if level_info == 1:</span>
+<span class="sd">            print(i, &quot; Stu:&quot;, image.StuItem, &quot; Ser:&quot;, image.SerItem, &quot; Num:&quot;, image.D02SeNu, &quot; Cont:&quot;, image.D11MRCo, &quot; Pln:&quot;, image.D12AcPl)</span>
+
+<span class="sd">    # Study: Features within a study</span>
+<span class="sd">    for i, study in enumerate(CStudy.Instanc):</span>
+<span class="sd">        if len(study.AllSers) != len(study.SeNuLst):</span>
+<span class="sd">            qa_var = [1, i]</span>
+<span class="sd">            break    </span>
+<span class="sd">    </span>
+<span class="sd">    # Series: The images in all series match all image objects</span>
+<span class="sd">    var_suma = 0; var_aux1 = []</span>
+<span class="sd">    for i, serie in enumerate(CSerie.Instanc):</span>
+<span class="sd">        var_aux1.append(serie)</span>
+<span class="sd">        if level_info == 2:</span>
+<span class="sd">            print(i, &quot; Stu:&quot;, serie.StuItem, &quot; Ser:&quot;, serie.SerItem, &quot; Num:&quot;, serie.S02SeNu, &quot; Img:&quot;, len(serie.AllImag))</span>
+<span class="sd">        var_suma += len(serie.AllImag)</span>
+<span class="sd">        # Dimension of the images</span>
+<span class="sd">        if serie.AllImag[0].ImgData.shape != (serie.S04RwNb, serie.S04ClNb):</span>
+<span class="sd">            qa_var = [2, 0]</span>
+<span class="sd">    if len(CImage.Instanc) != var_suma:</span>
+<span class="sd">        qa_var = [2, 1]</span>
+
+<span class="sd">    # Images</span>
+<span class="sd">    for i, serie in enumerate(CSerie.Instanc):</span>
+<span class="sd">        v_count0 = sum((obj.StuItem == serie.StuItem and obj.S02SeNu == CStudy.Instanc[serie.StuItem].SeNuLst[serie.SerItem]) for obj in var_aux1)</span>
+<span class="sd">        if v_count0 != 1: qa_var = [3, i]</span>
+<span class="sd">        v_count1 = len(serie.AllImag)</span>
+<span class="sd">        v_count2 = sum((img.StuItem == serie.StuItem and img.SerItem == serie.SerItem and img.D02SeNu == serie.S02SeNu) for img in var_aux0)</span>
+<span class="sd">        if v_count1 != v_count2:</span>
+<span class="sd">            qa_var = [4, i]</span>
+<span class="sd">    </span>
+<span class="sd">    # Closure</span>
+<span class="sd">    if qa_var[0]==0: print(&quot;QA approved&quot;)</span>
+<span class="sd">    else:</span>
+<span class="sd">        print(&quot;Error: Problemas con objetos de una clase (FQABC). Code:&quot;,qa_var); sys.exit(0)</span>
+
+
+<span class="sd">#############################</span>
+<span class="sd">#############################</span>
+<span class="sd"># Convenciones</span>
+<span class="sd">#############################</span>
+<span class="sd">#############################</span>
+<span class="sd"># Rows and Columns: en DICOM Rows es en X y Columns en Y</span>
+<span class="sd"># https://dicom.innolitics.com/ciods/rt-dose/image-plane/00280030</span>
+<span class="sd"># en python </span>
+<span class="sd">#</span>
+<span class="sd"># ImageOrientation e ImagePosition, bien explicado</span>
+<span class="sd"># https://cds.ismrm.org/protected/18MProceedings/PDFfiles/5652.html</span>
+<span class="sd">#</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SRC</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">SRC</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, LACID.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

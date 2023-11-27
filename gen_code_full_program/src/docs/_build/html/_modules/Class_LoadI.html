@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Class_LoadI &#8212; SRC 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=039e1c02" />
+    <script src="../_static/documentation_options.js?v=29a6c3e3"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for Class_LoadI</h1><div class="highlight"><pre>
+<span></span><span class="c1">#from ntpath import join</span>
+<span class="c1">#from operator import ne</span>
+<span class="c1">#import shelve</span>
+<span class="c1">#import pydicom</span>
+<span class="c1">#from collections import Counter</span>
+<span class="c1">#import gdcm</span>
+<span class="c1">#import pandas as pd</span>
+<span class="c1">#from scipy import ndimage,misc,signal</span>
+<span class="c1">#from itertools import repeat</span>
+<span class="c1">#from scipy.stats.stats import pearsonr</span>
+<span class="c1">#import cv2</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="c1">#import matplotlib.pyplot as plt</span>
+<span class="c1">#import numpy as np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">filedialog</span>
+<span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+<span class="c1">### Local libraries</span>
+<span class="c1">#from Class_Image import CImage</span>
+<span class="c1">#from Class_Serie import CSerie</span>
+<span class="c1">#from Class_Study import CStudy</span>
+<span class="c1">#import Funcn_Proce</span>
+
+<div class="viewcode-block" id="ClassLoadImage">
+<a class="viewcode-back" href="../Class_LoadI.html#Class_LoadI.ClassLoadImage">[docs]</a>
+<span class="k">class</span> <span class="nc">ClassLoadImage</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class that loads, organizes and manipulates a group of images&quot;&quot;&quot;</span>
+
+    <span class="n">Instanc</span><span class="o">=</span><span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span> <span class="c1">#pat_name=None,type=0,time=0,slice=0,img=None,te=0,tr=0,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This is the constructor function</span>
+<span class="sd">        :param resolution: Number of intensity levels in which the images will be processed&quot;&quot;&quot;</span>
+        <span class="n">ClassLoadImage</span><span class="o">.</span><span class="n">Instanc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">studies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_folder</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study_label</span> <span class="o">=</span> <span class="p">[]</span>                                 <span class="c1">#Etiqueta la cantidad de estudios del paciente</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
+
+<div class="viewcode-block" id="ClassLoadImage.folder_path">
+<a class="viewcode-back" href="../Class_LoadI.html#Class_LoadI.ClassLoadImage.folder_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">folder_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">path_aux</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function that defines the path of the DCM images folder</span>
+<span class="sd">        :param code: path by 1) path_aux, 2) python input, 3) sys.argv[1], 4) dialog box, 5) excel table</span>
+<span class="sd">        :param path_aux: default) none, folder path (code=1) or excel file path (code=5)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">pass</span> 
+        <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> 
+            <span class="n">path_aux</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Ingrese el path donde se encuentran las imagenes: &quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">path_aux</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="c1">#dialog_win = tk.Tk(); </span>
+            <span class="c1">#dialog_win.withdraw()</span>
+            <span class="n">path_aux</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">askdirectory</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;DICOM Folder&quot;</span><span class="p">)</span>
+            <span class="c1">#if not self.folder_path:</span>
+                <span class="c1">#label_log = &quot;01-01-01 Error: No selecciono directorio&quot;  </span>
+                <span class="c1">#Funcn_Proce.FP_error_log(0, label_log)</span>
+        <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">path_excel</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;tabla.xlsx&quot;</span>
+            <span class="n">var_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">path_excel</span><span class="p">)</span> <span class="c1"># Load the Excel file</span>
+            <span class="c1"># Print the entire DataFrame</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">var_df</span><span class="p">)</span>
+            <span class="n">study</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Ingrese el numero de un estudio: &quot;</span><span class="p">))</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">var_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var_df</span><span class="p">[</span><span class="s1">&#39;Num&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">study</span><span class="p">]</span> <span class="c1"># Find the value in a specific column</span>
+            <span class="c1"># Read another value from the same row</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folder_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_aux</span><span class="p">)</span> <span class="o">/</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Mod&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Pat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#self.folder_path = path_aux</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path_aux</span><span class="p">)</span>
+
+        <span class="c1"># Check if the path contains DICOM images</span>
+        <span class="n">found_dcm</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_folder</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.dcm&quot;</span><span class="p">):</span>
+                    <span class="n">found_dcm</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+        <span class="k">if</span> <span class="n">found_dcm</span><span class="p">:</span>
+            <span class="n">label_log</span> <span class="o">=</span> <span class="s2">&quot;01-01-02 Error: Path de las imagenes incorrecto&quot;</span>  
+<span class="c1">#            Funcn_Proce.FP_error_log(0, label_log)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Leyendo imágenes...&quot;</span><span class="p">)</span>
+        <span class="c1">#self.CL_organ_img()</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ###############</span>
+<span class="sd">    # 03-Organiza imágenes en estudios y series</span>
+<span class="sd">    ###############</span>
+
+<span class="sd">    def CL_organ_img(self):</span>
+<span class="sd">        cont0 = 0</span>
+<span class="sd">        # Se cuentan las imagenes DICOM en la carpeta</span>
+<span class="sd">        for root, dir, files in os.walk(self.folder_path):</span>
+<span class="sd">            for i in files:</span>
+<span class="sd">                if i.endswith(&quot;.dcm&quot;):</span>
+<span class="sd">                    if math.fmod(cont0, 1000) == 0 and cont0 &gt; 1:</span>
+<span class="sd">                        print(&quot;Número de imágenes analizadas:&quot;, cont0)</span>
+<span class="sd">                    auxPath = os.path.join(root,i)</span>
+<span class="sd">                    # Extraen características de cada imagen</span>
+<span class="sd">                    ObjtImg = CImage(auxPath)</span>
+<span class="sd">                    ObjtImg.CDMDcmFeat()</span>
+<span class="sd">                    ObjtImg.D00ReNu = cont0</span>
+<span class="sd">                    # Pregunta si existe el estudio, si no, la genera</span>
+<span class="sd">                    IdenStu = [] #Vector con nombre paciente y Study Time/Accession Number</span>
+<span class="sd">                    IdenStu.extend((ObjtImg.D01Name, ObjtImg.D01StTm))</span>
+<span class="sd">                    if IdenStu not in self.study_label:</span>
+<span class="sd">                        self.study_label.append(IdenStu)</span>
+<span class="sd">                        varAux0 = len(self.study_label) - 1</span>
+<span class="sd">                        # Se registra UNA UNICA VEZ el estudio</span>
+<span class="sd">                        self.studies.append(CStudy(ObjtImg, IdenStu, varAux0, self.resolution))</span>
+<span class="sd">                    # Pregunta si existe la serie, si no, la genera</span>
+<span class="sd">                    for j in self.studies: #Llena las series con sus imagenes</span>
+<span class="sd">                        if IdenStu == j.Identif:</span>
+<span class="sd">                            j.CY_serie_found(ObjtImg)</span>
+<span class="sd">                    cont0 += 1</span>
+<span class="sd">        print(&quot;Número total de imágenes:&quot;,cont0)</span>
+<span class="sd">        return None</span>
+
+<span class="sd">    ###############</span>
+<span class="sd">    # 04-Ordena las imagenes por posicion y</span>
+<span class="sd">    #    carga en matrices las imagenes</span>
+<span class="sd">    ###############</span>
+<span class="sd">    # code: -2 (all studies)</span>
+
+<span class="sd">    def CL_img_order(self, code):</span>
+<span class="sd">        </span>
+<span class="sd">        print(&quot;Ordenando y cargando imagenes...&quot;)</span>
+<span class="sd">        if code == -2:</span>
+<span class="sd">            [i.CY_img_order(-2) for i in self.studies]</span>
+<span class="sd">        else:</span>
+<span class="sd">            label_log = &quot;01-04-01 Error: FALTA PROGRAMAR&quot;</span>
+<span class="sd">            Funcn_Proce.FP_error_log(0, label_log)     </span>
+<span class="sd">        return None</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    ###############</span>
+<span class="sd">    # Busca imagenes de PC (4DF,DWI,MRE)</span>
+<span class="sd">    ###############</span>
+
+<span class="sd">    def CLImagePC(self):</span>
+
+<span class="sd">        print(&quot;Buscando imagenes PC&quot;)</span>
+<span class="sd">        for i in self.studies: i.CYSrAnPCs()</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">SRC</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">SRC</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, LACID.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
