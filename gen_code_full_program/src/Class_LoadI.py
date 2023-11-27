@@ -1,38 +1,41 @@
-#from ntpath import join
-#from operator import ne
-#import shelve
-#import pydicom
-#from collections import Counter
-#import gdcm
-#import pandas as pd
-#from scipy import ndimage,misc,signal
-#from itertools import repeat
-#from scipy.stats.stats import pearsonr
-#import cv2
+# from ntpath import join
+# from operator import ne
+# import shelve
+# import pydicom
+# from collections import Counter
+# import gdcm
+# import pandas as pd
+# from scipy import ndimage,misc,signal
+# from itertools import repeat
+# from scipy.stats.stats import pearsonr
+# import cv2
 import math
-#import matplotlib.pyplot as plt
-#import numpy as np
+
+# import matplotlib.pyplot as plt
+# import numpy as np
 import os
 import pandas as pd
 from pathlib import Path
 import sys
 from tkinter import filedialog
 import tkinter as tk
-### Local libraries
-#from Class_Image import CImage
-#from Class_Serie import CSerie
-#from Class_Study import CStudy
-#import Funcn_Proce
 
-class ClassLoadImage():
+### Local libraries
+# from Class_Image import CImage
+# from Class_Serie import CSerie
+# from Class_Study import CStudy
+# import Funcn_Proce
+
+
+class ClassLoadImage:
     """
     Class that loads, organizes and manipulates a group of images.
-    
+
     :param resol_int: Number of intensity levels in which the images will be processed.
     :type resol_int: int
     """
 
-    Instanc=[]
+    Instanc = []
 
     def __init__(self, resol_int: int = 1024):
         """
@@ -47,7 +50,7 @@ class ClassLoadImage():
         self.study_label = []
         self.resol_int = resol_int
 
-    def folder_path(self, code: int, error_log, path_aux = "none"):
+    def folder_path(self, code: int, error_log, path_aux="none"):
         """
         Function that defines the path of the DCM images folder
         :param code: path by 1) path_aux, 2) python input, 3) sys.argv[1], 4) dialog box, 5) excel List.xlsx
@@ -55,31 +58,32 @@ class ClassLoadImage():
         :param error_log: Object from ClassErrorLog
         :param path_aux: default) none, folder path (code=1) or excel file path (code=5)
         """
-        
-        if code == 1: pass 
-        elif code == 2: 
+
+        if code == 1:
+            pass
+        elif code == 2:
             path_aux = input("Ingrese el path donde se encuentran las imagenes: ")
         elif code == 3:
             path_aux = sys.argv[1]
         elif code == 4:
-            path_aux = filedialog.askdirectory(title = "DICOM Folder")
+            path_aux = filedialog.askdirectory(title="DICOM Folder")
             if not path_aux:
-                line_log = "01-01-01 Error: No selecciono directorio"  
+                line_log = "01-01-01 Error: No selecciono directorio"
                 error_log.write(0, line_log)
         elif code == 5:
-            read_list = pd.read_excel(path_aux) # Load the Excel file
+            read_list = pd.read_excel(path_aux)  # Load the Excel file
             # Print the entire DataFrame
             print(read_list)
             study_line = int(input("Ingrese el numero de un estudio: "))
-            print("Sline:",study_line,type(study_line))
-            row_number = read_list.ID[read_list['Number'] == study_line] # Find the value in a specific column
+            print("Sline:", study_line, type(study_line))
+            row_number = read_list.ID[
+                read_list["Number"] == study_line
+            ]  # Find the value in a specific column
             # Read another value from the same row
             print(row_number)
-            #self.folder_path = Path(path_aux) / row['Mod'].values[0] / row['Pat'].values[0]
-        
-        
-        
-        #self.folder_path = path_aux
+            # self.folder_path = Path(path_aux) / row['Mod'].values[0] / row['Pat'].values[0]
+
+        # self.folder_path = path_aux
         self.path_folder = Path(path_aux)
 
         # Check if the path contains DICOM images
@@ -94,9 +98,9 @@ class ClassLoadImage():
 
         else:
             print("Leyendo imágenes...")
-        #self.CL_organ_img()
+        # self.CL_organ_img()
         return None
-    
+
     """
     ###############
     # 03-Organiza imágenes en estudios y series

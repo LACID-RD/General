@@ -11,10 +11,11 @@ import sys
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-#from Class_Image import CImage
-#from Class_Proc import PProc
+
+# from Class_Image import CImage
+# from Class_Proc import PProc
 import math
-from scipy import ndimage,misc,signal
+from scipy import ndimage, misc, signal
 from itertools import repeat
 from scipy.stats.stats import pearsonr
 import cv2
@@ -28,7 +29,7 @@ import cv2
 ########################################
 ########################################
 
-def CDMGeneCT(self):
 
+def CDMGeneCT(self):
     ########################################### Grosor de slice [21]
-    self.D21SlTk=self.DcmImag[0x0018,0x0050].value
+    self.D21SlTk = self.DcmImag[0x0018, 0x0050].value

@@ -1,31 +1,33 @@
-#from inspect import CO_ITERABLE_COROUTINE
-#from operator import contains
-#import cmath
-#from numpy.lib.npyio import save
-#from skimage.io import imread, imsave
-#import tkinter as tk
-#from tkinter import filedialog
-#from pydicom.uid import generate_uid
-#import collections
-#from scipy.optimize import least_squares, minpack2
-#import math
-#from lmfit import Model
-#from lmfit import Parameters,minimize,fit_report
-#from scipy.signal import lfilter, lfilter_zi, filtfilt, butter
-#from matplotlib.pyplot import plot, legend, show, grid, figure, savefig
+# from inspect import CO_ITERABLE_COROUTINE
+# from operator import contains
+# import cmath
+# from numpy.lib.npyio import save
+# from skimage.io import imread, imsave
+# import tkinter as tk
+# from tkinter import filedialog
+# from pydicom.uid import generate_uid
+# import collections
+# from scipy.optimize import least_squares, minpack2
+# import math
+# from lmfit import Model
+# from lmfit import Parameters,minimize,fit_report
+# from scipy.signal import lfilter, lfilter_zi, filtfilt, butter
+# from matplotlib.pyplot import plot, legend, show, grid, figure, savefig
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 import sys
+
 ### Local libraries
-#from Class_Image import CImage
-#from Class_LoadI import CLoadI
-#from Class_Serie import CSerie
-#from Class_Study import CStudy
-LINE_FLUSH = '\r\033[K'
-UP_FRONT_LINE = '\033[F'
+# from Class_Image import CImage
+# from Class_LoadI import CLoadI
+# from Class_Serie import CSerie
+# from Class_Study import CStudy
+LINE_FLUSH = "\r\033[K"
+UP_FRONT_LINE = "\033[F"
 DEFAULT_LOG_NAME = "error_log.txt"
 DEFAULT_LOG_PATH = Path.cwd()
+
 
 class ClassErrorLog:
     """
@@ -36,24 +38,31 @@ class ClassErrorLog:
 
     :param log_name: Name of the error_log.
     :type log_name: str
-    
+
     :param path_log: Path of the error_log localization.
     """
-    
-    def __init__(self, user_int: int = 2, log_name: str = DEFAULT_LOG_NAME, path_log = DEFAULT_LOG_PATH):
+
+    def __init__(
+        self,
+        user_int: int = 2,
+        log_name: str = DEFAULT_LOG_NAME,
+        path_log=DEFAULT_LOG_PATH,
+    ):
         """
         This is the constructor function.
 
         :param user_int: User interaction 0) only file, 1) file/terminal, 2) only terminal, 3) none.
         :type user_int: int
-        
+
         :param log_name: Name of the error_log.
         :type log_name: str
-        
+
         :param path_log: Path of the error_log localization.
         """
         if user_int < 0 or user_int > 3:
-            raise ValueError("Incorrect configuration of the error log. See ClassErrorLog_init.")
+            raise ValueError(
+                "Incorrect configuration of the error log. See ClassErrorLog_init."
+            )
         self.user_int = user_int
         self.log_name = log_name
         self.path_log = path_log
@@ -71,7 +80,7 @@ class ClassErrorLog:
         :return: None
         """
         if self.user_int < 2:
-            with open(self.path_log, 'w'):
+            with open(self.path_log, "w"):
                 pass  # Doing nothing in the block effectively clears the file if it exists
         return None
 
@@ -87,21 +96,29 @@ class ClassErrorLog:
 
         :return: None
         """
-        #print("userInt:",self.user_int, code)
+        # print("userInt:",self.user_int, code)
         line_log = f"Warning {line_log}" if code == 1 else line_log
-        #print("linelog:",line_log)
+        # print("linelog:",line_log)
         if code == 0:
-                raise ValueError("Output Error:", line_log)
+            raise ValueError("Output Error:", line_log)
         elif code in [1, 2]:
-            if (self.user_int in [0, 1] and code == 1) or (code == 2 and self.user_int == 0):
-                with open(self.path_log, 'a') as log_file:
+            if (self.user_int in [0, 1] and code == 1) or (
+                code == 2 and self.user_int == 0
+            ):
+                with open(self.path_log, "a") as log_file:
                     log_file.write(line_log + "\n")  # Write a string to the file
-            elif (self.user_int in [1, 2] and code == 2) or (code == 1 and self.user_int == 2):
+            elif (self.user_int in [1, 2] and code == 2) or (
+                code == 1 and self.user_int == 2
+            ):
                 print(line_log)
         else:
-            raise ValueError("Incorrect configuration of the error log. See ClassErrorLog_write")
+            raise ValueError(
+                "Incorrect configuration of the error log. See ClassErrorLog_write"
+            )
         return None
-#User interaction 0) only file, 1) file/terminal, 2) only terminal, 3) none.
+
+
+# User interaction 0) only file, 1) file/terminal, 2) only terminal, 3) none.
 #############################
 # QA Functions
 #############################

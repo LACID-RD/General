@@ -1,4 +1,4 @@
-# Descomprime imagenes 
+# Descomprime imagenes
 #unzip 2.16.840.1.114584.4142594449.29072.20143.46613.238949137071360.zip -d /home/daniel/Documents/FAuto/ImgID/Images
 #for i in $PWD/Images/*
 #do
@@ -14,4 +14,3 @@ echo "terminooo se las mande a guardar"
 #mkdir NIFTI_Fol
 #mv DICOM_Fol/T1_3D/T1* NIFTI_Fol/
 #bet2 NIFTI_Fol/T1.nii.gz NIFTI_Fol/Bet -o -m -s -e
-
