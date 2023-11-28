@@ -31,7 +31,6 @@ import Funcn_Proce
 #############################
 #############################
 
-a=1
 class CStudy:
     Instanc = []
 
