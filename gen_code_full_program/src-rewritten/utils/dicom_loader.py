@@ -3,7 +3,6 @@ import os
 import numpy as np
 from typing import List
 import pydicom
-
 from dicom_sorter import DicomSorterMRI
 from dicom_volume import DicomVolumeMRI
 
@@ -97,12 +96,10 @@ if __name__ == "__main__":
         directory = "/home/ralcala/Documents/AID4ID/testPatients/23342540/20231102/columna_lumbar_2_bl/t2w_tse_sag"
     except IsADirectoryError:
         pass
-    dicom_loader = DicomLoaderMRI(directory)
-    dicom_files = dicom_loader._sorted_files
-    #print(dicom_files)
-    #dicom_files = dicom_loader._sorted_files
-    print(len(dicom_files))
+    loader = DicomLoaderMRI(directory)
+    dcm_list = loader.dicom_loader(loader.sorted_files)
+    print(len(dcm_list))
 
-    for i in dicom_files:
-        print(pydicom.dcmread(i).InstanceNumber)
+    for i in dcm_list:
+        print(i.InstanceNumber)
     pass
