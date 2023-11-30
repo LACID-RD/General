@@ -52,7 +52,7 @@ class DicomVolumeMRI:
 
 if __name__ == "__main__":
     try:
-        directory = "/home/ralcala/Documents/AID4ID/testPatients/23342540/20231102/columna_lumbar_2_bl/t2w_tse_sag"
+        directory = "/path/to/directory"
     except IsADirectoryError:
         pass
     # Replace with your directory path

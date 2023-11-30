@@ -47,7 +47,7 @@ class DicomSorterMRI:
 if __name__ == "__main__":
     # Replace with your directory path
     try:
-        directory = "/home/ralcala/Documents/AID4ID/testPatients/23342540/20231102/columna_lumbar_2_bl/t2w_tse_sag"
+        directory = "/path/to/directory"
     except IsADirectoryError:
         pass
 

@@ -47,7 +47,7 @@ class DicomPlotter:
 
 
 if __name__ == "__main__":
-    directory = "/home/ralcala/Documents/AID4ID/testPatients/23342540/20231102/columna_lumbar_2_bl/t2w_tse_sag"
+    directory = "C:/Users/Daniel/Documents/IT/Python/Images/Lumbar"
     plotter = DicomPlotter(directory)
     plotter._plot_all_files
     plotter._plot_single_file(img_num_input=0)
