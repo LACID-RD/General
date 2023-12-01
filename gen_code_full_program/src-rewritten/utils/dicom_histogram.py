@@ -98,7 +98,6 @@ class HistogramGenerator:
         return average_hist, bins
 
 
-
 if __name__ == "__main__":
     directory = "/your/dicom/directory"
     loader = DicomLoaderMRI(directory)
