@@ -84,22 +84,24 @@ class DicomLoaderMRI:
         Returns:
             np.ndarray: The volumetric array of the DICOM files.
         """
-        if not hasattr(self, "_volumetric_array"):
-            self._volumetric_array = DicomVolumeMRI(
-                self.directory_path
-            ).volumetric_array
+        if self._volumetric_array is None:
+            self._volumetric_array = self._get_volumetric_array()
         return self._volumetric_array
+
+    def _get_volumetric_array(self) -> np.ndarray:
+        return DicomVolumeMRI(self.directory_path).volumetric_array
 
 
 if __name__ == "__main__":
     try:
-        directory = "/path/to/directory"
+        directory = "/your/directory/path"
     except IsADirectoryError:
         pass
     loader = DicomLoaderMRI(directory)
     dcm_list = loader.dicom_loader(loader.sorted_files)
     print(len(dcm_list))
-
+    volumetric_array = loader.volumetric_array
+    print(volumetric_array)
     for i in dcm_list:
         print(i.InstanceNumber)
     pass
