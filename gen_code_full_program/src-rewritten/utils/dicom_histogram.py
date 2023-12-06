@@ -6,15 +6,8 @@ from dicom_loader import DicomLoaderMRI
 
 class HistogramGenerator:
     def __init__(self, array_2D=None, array_3D=None):
-        """
-        Initializes the HistogramGenerator class with optional 2D and 3D arrays.
-
-        Args:
-            array_2D (np.ndarray, optional): 2D array used for generating 2D histograms. Defaults to None.
-            array_3D (np.ndarray, optional): 3D array used for generating 3D histograms. Defaults to None.
-        """
-        self.array_2D = array_2D
-        self.array_3D = array_3D
+        self.array_2D = array_2D if array_2D is not None else None
+        self.array_3D = array_3D if array_3D is not None else None
 
     def create_histogram_2D(self, offset: int = 0, show: bool = True):
         """
