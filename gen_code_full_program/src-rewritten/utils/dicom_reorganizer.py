@@ -16,7 +16,11 @@ class DicomReorganizer:
 
         self.study_directory = study_directory
 
-    def _clean_text(self, string, forbidden_symbols=["*", ".", ",", "\"", "\\", "/", "|", "[", "]", ":", ";", " "]):
+    def _clean_text(
+        self,
+        string,
+        forbidden_symbols=["*", ".", ",", '"', "\\", "/", "|", "[", "]", ":", ";", " "],
+    ):
         """
         Clean and standardize text descriptions.
 
@@ -33,11 +37,13 @@ class DicomReorganizer:
         if string is None or not isinstance(string, str):
             return ""
 
-        string = string.lower() # convert the string to lowercase
-        translation_table = str.maketrans("".join(forbidden_symbols), "_" * len(forbidden_symbols))
+        string = string.lower()  # convert the string to lowercase
+        translation_table = str.maketrans(
+            "".join(forbidden_symbols), "_" * len(forbidden_symbols)
+        )
         return string.translate(translation_table)
 
-    def reorganize(self, src: str):
+    def reorganize(self, src):
         """
         Organizes DICOM files into a nested folder structure based on patient, study, and series information.
         Cleans and standardizes text descriptions and generates a new standardized file name for each DICOM file.
@@ -51,7 +57,7 @@ class DicomReorganizer:
         dst = src
 
         print("reading file list...")
-        unsortedList = [Path(root) / file for root, _, files in Path(src).rglob('*.dcm') for file in files]
+        unsortedList = [dicom_path for dicom_path in Path(src).rglob("*.dcm")]
 
         print(f"{len(unsortedList)} files found.")
 
@@ -76,7 +82,9 @@ class DicomReorganizer:
             try:
                 ds.decompress()
             except Exception as e:
-                raise Exception(f'an instance in file {patientID} - {studyDate} - {studyDescription} - {seriesDescription}" could not be decompressed. Exiting. Error: {str(e)}')
+                raise Exception(
+                    f'an instance in file {patientID} - {studyDate} - {studyDescription} - {seriesDescription}" could not be decompressed. Exiting. Error: {str(e)}'
+                )
 
             # save files to a 4-tier nested folder structure
             patient_path = os.path.join(dst, patientID)
@@ -98,5 +106,6 @@ class DicomReorganizer:
 
 
 if __name__ == "__main__":
-    reorganizer = DicomReorganizer(os.getcwd())
-    reorganizer.reorganize(os.getcwd())
+    path = "/home/ralcala/Documents/FUESMEN/LACID/General/gen_code_full_program/src-rewritten/utils"
+    reorganizer = DicomReorganizer(path)
+    reorganizer.reorganize(path)
