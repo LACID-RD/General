@@ -3,8 +3,9 @@ import os
 import numpy as np
 from typing import List
 import pydicom
-from dicom_sorter import DicomSorterMRI
-from dicom_volume import DicomVolumeMRI
+
+from utils.dicom_sorter import DicomSorterMRI
+from utils.dicom_volume import DicomVolumeMRI
 
 
 class DicomLoaderMRI:

@@ -15,7 +15,6 @@ class DicomPlotter:
     def _show_image(self, arr: np.ndarray, show: bool = True):
         """
         Plot a 2D or 3D array using SimpleITK.
-        Requires Fiji or some other external viewer.
 
         Args:
             arr (np.ndarray): A 2D or 3D array.

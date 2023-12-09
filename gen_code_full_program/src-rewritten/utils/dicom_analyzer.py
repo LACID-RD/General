@@ -1,8 +1,6 @@
 from typing import List
 import pydicom
-import numpy as np
 import os
-
 
 class DicomAnalyzer:
     def __init__(self, study_directory_path: str) -> None:
@@ -60,15 +58,40 @@ class DicomAnalyzer:
         """
         datasets = []
         for file_path in file_paths:
-            datasets.append(pydicom.dcmread(file_path, stop_before_pixels=True))
-
+            try:
+                datasets.append(pydicom.dcmread(file_path, stop_before_pixels=True))
+            except pydicom.errors.InvalidDicomError:
+                print(f"Failed to read DICOM file: {file_path}")
+                continue
+            
         return datasets
+
+    def _determine_sequence(self, datasets: List[pydicom.Dataset]):
+        sequences = []
+        for i in datasets:
+            if "SeriesDescription" in i:
+                sequences.append(i.SeriesDescription)
+            else:
+                raise ValueError("No series description found")
+        
+        return sequences
+    
+    def _determine_institution(self, datasets: List[pydicom.Dataset]):
+        institutions = []
+        for i in datasets:
+            if hasattr(i, "InstitutionName"):
+                try:
+                    institutions.append(i.InstitutionName)
+                except:
+                    raise ValueError("No institution name found")
+            
+        return institutions
 
 
 if __name__ == "__main__":
-    study_dir = "/home/ralcala/Documents/AID4ID/testPatients/23342540/20231102/columna_lumbar_2_bl"
+    study_dir = "/your/directory/path"
     analyzer = DicomAnalyzer(study_dir)
-    for i in analyzer._file_paths:
-        print(i)
-    for k in analyzer._read_files(analyzer._file_paths):
-        print(k)
+    paths = analyzer._file_paths
+    reader = analyzer._read_files(paths)
+    print(analyzer._determine_sequence(analyzer._read_files(analyzer._file_paths)))
+    print(analyzer._determine_institution(analyzer._read_files(analyzer._file_paths)))

@@ -27,7 +27,7 @@ class DicomReorganizer:
         Parameters:
         - string: a string representing the text to be cleaned.
         - forbidden_symbols: a list of symbols to be replaced with an underscore.
-
+        
         Returns:
         - a string with cleaned and standardized text.
 
@@ -79,12 +79,14 @@ class DicomReorganizer:
             fileName = f"{modality}.{seriesInstanceUID}.{instanceNumber}.dcm"
 
             # uncompress files (using the gdcm package)
-            try:
-                ds.decompress()
-            except Exception as e:
-                raise Exception(
-                    f'an instance in file {patientID} - {studyDate} - {studyDescription} - {seriesDescription}" could not be decompressed. Exiting. Error: {str(e)}'
-                )
+            
+            if not ds.is_decompressed and hasattr(ds, "PixelData"):
+                try:
+                    ds.decompress()
+                except Exception as e:
+                    raise Exception(
+                        f'an instance in file {patientID} - {studyDate} - {studyDescription} - {seriesDescription}" could not be decompressed. Exiting. Error: {str(e)}'
+                    )
 
             # save files to a 4-tier nested folder structure
             patient_path = os.path.join(dst, patientID)
@@ -106,6 +108,6 @@ class DicomReorganizer:
 
 
 if __name__ == "__main__":
-    path = "/home/ralcala/Documents/FUESMEN/LACID/General/gen_code_full_program/src-rewritten/utils"
+    path = "/your/directory/path"
     reorganizer = DicomReorganizer(path)
     reorganizer.reorganize(path)
